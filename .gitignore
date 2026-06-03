@@ -1,0 +1,19 @@
+# OS metadata files
+.DS_Store
+Thumbs.db
+.directory
+
+# Node/Dependency directories (if you ever use npm)
+node_modules/
+dist/
+.wrangler/
+
+# Local Environment Secrets (Crucial: Never commit these!)
+.env
+.env.local
+wrangler.toml
+
+# cPanel automatic backups and system logs
+*.log
+.well-known/
+cgi-bin/

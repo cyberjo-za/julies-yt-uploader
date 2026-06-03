@@ -1,0 +1,56 @@
+# ----------------------------------------------------------------------
+# 1. FORCE HTTPS AND DIRECTORY DEFAULTS
+# ----------------------------------------------------------------------
+RewriteEngine On
+RewriteCond % {HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+DirectoryIndex index.html
+
+# ----------------------------------------------------------------------
+# 2. SECURITY HEADERS (Enterprise Best Practices)
+# ----------------------------------------------------------------------
+
+# Prevent site from being embedded in iframes (Anti-Clickjacking)
+Header set X-Frame-Options "SAMEORIGIN"
+
+# Prevent browsers from sniffing MIME types away from declared types
+Header set X-Content-Type-Options "nosniff"
+
+# Referrer Policy: Send the origin only when navigating to same-origin
+Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+# HSTS: Enforce HTTPS for 1 year (only enable after SSL is green)
+Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+# ----------------------------------------------------------------------
+# 3. CONTENT SECURITY POLICY (CSP)
+# ----------------------------------------------------------------------
+# This is customized for Microsoft Entra ID (login) and YouTube (upload)
+# default-src 'none' blocks everything by default for maximum security.
+Header set Content-Security-Policy "default-src 'none'; \
+    script-src 'self' 'unsafe-inline' https://alcdn.msauth.net; \
+    connect-src 'self' https://login.microsoftonline.com https://julies-yt-uploader.oostenjac.workers.dev https://*.googleapis.com; \
+    img-src 'self' data: https://placehold.co; \
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; \
+    font-src 'self' https://fonts.gstatic.com; \
+    frame-src 'self' https://login.microsoftonline.com; \
+    base-uri 'self'; \
+    form-action 'self';"
+
+# ----------------------------------------------------------------------
+# 4. PERFORMANCE & CACHING (Optimization)
+# ----------------------------------------------------------------------
+<IfModule mod_expires.c>
+    ExpiresActive On
+    # Cache images and favicons for 1 month
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 month"
+    # Do not cache the HTML (ensures users always get the latest portal)
+    ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# ----------------------------------------------------------------------
+# 5. DISABLE DIRECTORY BROWSING
+# ----------------------------------------------------------------------
+Options -Indexes
