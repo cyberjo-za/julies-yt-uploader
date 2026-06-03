@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Julies Attorneys Video Intake Portal</title>
+  <link rel="icon" type="image/x-icon" href="fav.ico">
+  <script src="https://alcdn.msauth.net/browser/2.35.0/js/msal-browser.min.js"></script>
+  <style>
+    :root {
+      --primary: #0f172a;      /* Slate 900 */
+      --accent: #1e3a8a;       /* Brand Navy Blue */
+      --hover: #172554;
+      --bg: #f8fafc;           /* Delicate off-white */
+      --card: #ffffff;
+      --border: #cbd5e1;       /* Gray 300 */
+      --border-focus: #2563eb;  /* Safe blue */
+      --text: #334155;         /* Slate 700 */
+      --text-muted: #64748b;
+    }
+
+    /* Core Visibility Rule */
+    .hidden {
+      display: none !important;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      padding: 40px 32px;
+      text-align: center;
+    }
+
+    .logo-wrapper {
+      margin-bottom: 24px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+
+    .logo {
+      height: 75px;
+      width: auto;
+      max-width: 100%;
+      object-fit: contain;
+      border-radius: 0;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 0 0 6px 0;
+      letter-spacing: -0.02em;
+    }
+
+    p.subtitle {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin: 0 0 28px 0;
+      line-height: 1.5;
+    }
+
+    .info-card {
+      background-color: #f0f4f8;
+      border-left: 4px solid var(--accent);
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: left;
+      color: #1e293b;
+      margin-bottom: 20px;
+    }
+
+    .tip-box {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: #fef3c7;
+      border: 1px solid #fde68a;
+      color: #78350f;
+      font-size: 12.5px;
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background-color: #f1f5f9;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid #e2e8f0;
+      font-size: 13px;
+      color: var(--primary);
+    }
+
+    .ms-grid-icon {
+      flex-shrink: 0;
+      display: inline-flex;
+    }
+
+    .btn-microsoft {
+      background-color: #2F2F2F;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 13px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-microsoft:hover {
+      background-color: #1a1a1a;
+      transform: translateY(-1px);
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: #fbfcfe;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 24px 16px;
+      text-align: center;
+      background: #fafbfd;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 24px;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--border-focus);
+      background: #f5f8ff;
+    }
+
+    .drop-zone-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .drop-zone-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .drop-zone-filename {
+      display: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--border-focus);
+      word-break: break-all;
+    }
+
+    .hidden-file-input {
+      display: none;
+    }
+
+    .btn-submit {
+      background-color: var(--accent);
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 13px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s ease;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--hover);
+    }
+
+    .btn-submit:disabled {
+      background-color: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    #progress-bar {
+      width: 100%;
+      background: #f1f5f9;
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 20px;
+      display: none;
+      border: 1px solid #e2e8f0;
+    }
+
+    #progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    #status-msg {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .processing-disclaimer {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #b45309;
+      background-color: #fffbeb;
+      border: 1px solid #fef3c7;
+      padding: 10px 12px;
+      border-radius: 6px;
+      line-height: 1.4;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="logo-wrapper">
+        <!-- Relative path to load image directly from your Afrihost workspace -->
+        <img src="brand.jpeg" alt="Logo" class="logo" id="logo-img" onerror="this.style.display='none'">
+      </div>
+
+      <h2>Julies Attorneys</h2>
+      <p class="subtitle">Video Upload portal for Property Practitioners of Julies Attorneys</p>
+      
+      <!-- Step 1: Login UI (Only Shows if NOT authenticated) -->
+      <div id="login-section">
+        <div class="info-card">
+          🔑 <strong>Access Verification Required:</strong><br>
+          Please authenticate with an authorized Julies Attorneys Microsoft account or confirmed external Guest account to open the intake portal.
+        </div>
+        
+        <button class="btn-microsoft" onclick="signIn()">
+          <svg class="ms-grid-icon" width="18" height="18" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0H11V11H0V0Z" fill="#F25022"/>
+            <path d="M12 0H23V11H12V0Z" fill="#7FBA00"/>
+            <path d="M0 12H11V23H0V12Z" fill="#00A4EF"/>
+            <path d="M12 12H23V23H12V12Z" fill="#FFB900"/>
+          </svg>
+          Sign In with Microsoft 365
+        </button>
+
+        <div class="tip-box">
+          💡 <strong>Authentication Issues?</strong><br>
+          If you experience an authentication loop or permission error, please copy this URL and open it in a <strong>Private / Incognito Window</strong>.
+        </div>
+      </div>
+
+      <!-- Step 2: Form Panel (Hidden until successfully Authenticated) -->
+      <div id="upload-section" class="hidden">
+        <div class="user-badge">
+          <svg class="ms-grid-icon" width="14" height="14" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0H11V11H0V0Z" fill="#F25022"/>
+            <path d="M12 0H23V11H12V0Z" fill="#7FBA00"/>
+            <path d="M0 12H11V23H0V12Z" fill="#00A4EF"/>
+            <path d="M12 12H23V23H12V12Z" fill="#FFB900"/>
+          </svg>
+          <span>Logged in as: <strong id="user-email"></strong></span>
+        </div>
+        
+        <div class="form-group">
+          <label>Video Title</label>
+          <input type="text" id="title" placeholder="Enter clean video reference title...">
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="description" rows="3" placeholder="Provide video context details..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Video Resource</label>
+          <div class="drop-zone" id="drop-zone">
+            <div id="drop-text">
+              <div class="drop-zone-icon">📥</div>
+              <span class="drop-zone-text">Drag file here or <strong style="color:var(--border-focus)">browse</strong> to select</span>
+            </div>
+            <div class="drop-zone-filename" id="drop-filename"></div>
+          </div>
+          <input type="file" id="videoFile" accept="video/*" class="hidden-file-input">
+        </div>
+
+        <button class="btn-submit" id="upload-btn" onclick="startUpload()">Upload to YouTube</button>
+        
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+        <div id="status-msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- MICROSOFT AD DETAILS CONFIGURATION ---
+    const msalConfig = {
+      auth: {
+        clientId: "9ba95a02-eb5e-48d1-93a0-4c78dfb75086", // Paste your Entra App ID here
+        authority: "https://login.microsoftonline.com/8f57e823-ceed-4ba4-a9bb-11a295769077", // Paste your Tenant ID here
+        redirectUri: window.location.origin // Dynamic redirect callback URI
+      }
+    };
+    
+    
+    // Hardcoded target to point to your secure background Cloudflare Worker
+    const WORKER_URL = "https://julies-yt-uploader.oostenjac.workers.dev"; 
+    // ------------------------------------------
+
+    const msalInstance = new msal.PublicClientApplication(msalConfig);
+    let currentUser = null;
+
+    // Microsoft Guest UPN Cleaner
+    function getCleanEmail(account) {
+      if (account.idTokenClaims && account.idTokenClaims.email) {
+        return account.idTokenClaims.email;
+      }
+      const upn = account.username; 
+      if (upn.includes("#EXT#")) {
+        try {
+          const rawLeftSegment = upn.split("#EXT#")[0];
+          const lastUnderscore = rawLeftSegment.lastIndexOf("_");
+          if (lastUnderscore !== -1) {
+            return rawLeftSegment.substring(0, lastUnderscore) + "@" + rawLeftSegment.substring(lastUnderscore + 1);
+          }
+        } catch (e) {
+          console.error("B2B Parsing Error", e);
+        }
+      }
+      return upn;
+    }
+
+    // Drag-and-Drop Handler Configurations
+    const dropZone = document.getElementById("drop-zone");
+    const fileInput = document.getElementById("videoFile");
+
+    dropZone.addEventListener("click", () => fileInput.click());
+
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+
+    ["dragleave", "dragend"].forEach(type => {
+      dropZone.addEventListener(type, () => dropZone.classList.remove("dragover"));
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        updateFileDisplay();
+      }
+    });
+
+    fileInput.addEventListener("change", updateFileDisplay);
+
+    function updateFileDisplay() {
+      const file = fileInput.files[0];
+      if (file) {
+        document.getElementById("drop-text").style.display = "none";
+        const filenameLabel = document.getElementById("drop-filename");
+        filenameLabel.style.display = "block";
+        filenameLabel.innerHTML = `🎥 <strong>${file.name}</strong><br><span style="font-size:11px;color:var(--text-muted)">(${(file.size / (1024 * 1024)).toFixed(1)} MB)</span>`;
+      }
+    }
+
+    // Check MSAL browser cache on startup
+    window.addEventListener("load", async () => {
+      try {
+        const cachedAccounts = msalInstance.getAllAccounts();
+        if (cachedAccounts.length > 0) {
+          currentUser = cachedAccounts[0];
+          showUploadSection(currentUser);
+        }
+      } catch (err) {
+        console.warn("MSAL cache reading failed", err);
+      }
+    });
+
+    function showUploadSection(account) {
+      document.getElementById("user-email").innerText = getCleanEmail(account);
+      document.getElementById("login-section").classList.add("hidden");
+      document.getElementById("upload-section").classList.remove("hidden");
+    }
+
+    async function signIn() {
+      try {
+        const loginResponse = await msalInstance.loginPopup({ scopes: ["user.read"] });
+        currentUser = loginResponse.account;
+        showUploadSection(currentUser);
+      } catch (err) {
+        alert("Authentication failed! Please log in with an authorized Microsoft profile.");
+        console.error(err);
+      }
+    }
+
+    async function getMsAccessToken() {
+      const tokenRequest = { scopes: ["user.read"] };
+      try {
+        const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+        return tokenResponse.accessToken;
+      } catch (err) {
+        console.warn("Silent token fallback execution required:", err);
+        if (err instanceof msal.InteractionRequiredAuthError) {
+          const tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+          return tokenResponse.accessToken;
+        }
+        throw err;
+      }
+    }
+
+    async function startUpload() {
+      const title = document.getElementById("title").value;
+      const description = document.getElementById("description").value;
+      const file = fileInput.files[0];
+
+      if (!file) return alert("Please select a video file first!");
+
+      document.getElementById("upload-btn").disabled = true;
+      const progressContainer = document.getElementById("progress-bar");
+      const progressFill = document.getElementById("progress-fill");
+      const statusMsg = document.getElementById("status-msg");
+
+      statusMsg.style.background = "#eff6ff";
+      statusMsg.style.color = "#1e40af";
+      statusMsg.innerHTML = "Authenticating secure upload channel with Microsoft...";
+
+      try {
+        const msToken = await getMsAccessToken();
+
+        statusMsg.innerHTML = "Constructing secure single-use stream tunnel into YouTube...";
+
+        const response = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${msToken}`
+          },
+          body: JSON.stringify({ title, description })
+        });
+
+        if (response.status === 401) {
+          throw new Error("Unauthorized Access: Your Microsoft session has expired or is invalid.");
+        }
+
+        const { uploadUrl } = await response.json();
+        if (!uploadUrl) throw new Error("Could not construct cloud upload handshake token.");
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", uploadUrl, true);
+        xhr.setRequestHeader("Content-Type", file.type);
+
+        progressContainer.style.display = "block";
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const percentage = Math.round((e.loaded / e.total) * 100);
+            progressFill.style.width = percentage + "%";
+            statusMsg.innerHTML = `Streaming direct to YouTube: <strong>${percentage}%</strong> completed. Keep this tab active...`;
+          }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status === 200 || xhr.status === 201) {
+            try {
+              const videoData = JSON.parse(xhr.responseText);
+              const videoId = videoData.id;
+              
+              const shareUrl = `https://youtu.be/${videoId}`;
+              const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+              statusMsg.style.background = "#ecfdf5";
+              statusMsg.style.color = "#065f46";
+              statusMsg.innerHTML = `
+                <strong style="font-size: 15px;">✓ Upload Completed!</strong>
+                <p style="margin: 6px 0;">This file was successfully saved to your channel library under an <strong>Unlisted</strong> security status.</p>
+                
+                <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid #a7f3d0; margin-top: 10px; text-align: left; display: flex; flex-direction: column; gap: 10px;">
+                  <div>
+                    <strong style="font-size:10px; text-transform:uppercase; color:var(--text-muted); display:block;">Option 1: Mobile Share Link</strong>
+                    <a href="${shareUrl}" target="_blank" style="color: #2563eb; text-decoration: underline; font-weight: 700; word-break: break-all;">${shareUrl}</a>
+                  </div>
+                  <div>
+                    <strong style="font-size:10px; text-transform:uppercase; color:var(--text-muted); display:block;">Option 2: Browser Watch Link</strong>
+                    <a href="${watchUrl}" target="_blank" style="color: #2563eb; text-decoration: underline; font-weight: 700; word-break: break-all;">${watchUrl}</a>
+                  </div>
+                </div>
+
+                <div class="processing-disclaimer">
+                  🕒 <strong>Processing Time Note:</strong> YouTube requires approximately <strong>2 to 5 minutes</strong> to process high-definition video resources. If the links display a processing error, please wait a minute and refresh.
+                </div>
+              `;
+
+              document.getElementById("title").value = "";
+              document.getElementById("description").value = "";
+              fileInput.value = "";
+              document.getElementById("drop-text").style.display = "block";
+              document.getElementById("drop-filename").style.display = "none";
+              document.getElementById("upload-btn").disabled = false;
+              progressContainer.style.display = "none";
+
+            } catch (err) {
+              statusMsg.innerHTML = "✓ File uploaded successfully! (Link parsing failed, please verify video in YouTube Studio).";
+              document.getElementById("upload-btn").disabled = false;
+            }
+          } else {
+            statusMsg.style.background = "#fef2f2";
+            statusMsg.style.color = "#991b1b";
+            statusMsg.innerHTML = "<strong>Upload rejected.</strong> Status: " + xhr.statusText;
+            document.getElementById("upload-btn").disabled = false;
+          }
+        };
+
+        xhr.onerror = () => {
+          statusMsg.style.background = "#fef2f2";
+          statusMsg.style.color = "#991b1b";
+          statusMsg.innerHTML = "<strong>Connection Error.</strong> Direct network transport was interrupted.";
+          document.getElementById("upload-btn").disabled = false;
+        };
+
+        xhr.send(file);
+
+      } catch (err) {
+        statusMsg.style.background = "#fef2f2";
+        statusMsg.style.color = "#991b1b";
+        statusMsg.innerHTML = "<strong>Authorization Error:</strong> " + err.message;
+        document.getElementById("upload-btn").disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

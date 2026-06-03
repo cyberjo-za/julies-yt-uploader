@@ -1,0 +1,9 @@
+    // --- MICROSOFT AD DETAILS CONFIGURATION ---
+    const msalConfig = {
+      auth: {
+        clientId: "9ba95a02-eb5e-48d1-93a0-4c78dfb75086", // Paste your Entra App ID here
+        authority: "https://login.microsoftonline.com/8f57e823-ceed-4ba4-a9bb-11a295769077", // Paste your Tenant ID here
+        redirectUri: window.location.origin // Dynamic redirect callback URI
+      }
+    };
+    
