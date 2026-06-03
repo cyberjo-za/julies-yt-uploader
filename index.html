@@ -288,7 +288,6 @@
   <div class="container">
     <div class="card">
       <div class="logo-wrapper">
-        <!-- Relative path to load image directly from your Afrihost workspace -->
         <img src="brand.jpeg" alt="Logo" class="logo" id="logo-img" onerror="this.style.display='none'">
       </div>
 
@@ -369,9 +368,8 @@
         redirectUri: window.location.origin // Dynamic redirect callback URI
       }
     };
-    
-    
-    // Hardcoded target to point to your secure background Cloudflare Worker
+        
+    // Background Cloudflare Worker
     const WORKER_URL = "https://julies-yt-uploader.oostenjac.workers.dev"; 
     // ------------------------------------------
 
@@ -448,6 +446,10 @@
     });
 
     function showUploadSection(account) {
+      currentUser = account;
+      // CRUCIAL FIX 1: Set the logged-in account as the active session in MSAL
+      msalInstance.setActiveAccount(account);
+      
       document.getElementById("user-email").innerText = getCleanEmail(account);
       document.getElementById("login-section").classList.add("hidden");
       document.getElementById("upload-section").classList.remove("hidden");
@@ -465,7 +467,17 @@
     }
 
     async function getMsAccessToken() {
-      const tokenRequest = { scopes: ["user.read"] };
+      // CRUCIAL FIX 2: Retrieve the active account context safely
+      const activeAccount = msalInstance.getActiveAccount() || currentUser;
+      if (!activeAccount) {
+        throw new Error("No active Microsoft session found. Please sign in again.");
+      }
+
+      const tokenRequest = { 
+        scopes: ["user.read"],
+        account: activeAccount // CRUCIAL FIX 3: Explicitly pass the active account object
+      };
+
       try {
         const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
         return tokenResponse.accessToken;
